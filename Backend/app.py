@@ -45,19 +45,23 @@ def get_old_users():
     users = User.query.order_by(User.createdAt).limit(5).all()
     return jsonify([user.as_dict() for user in users])
 
-@app.route("/api/change_picture/<string:id>", methods=["PATCH"])
-def change_picture(id):
-  data = request.get_json()
-  new_picture = data.get('picture')
+@app.route("/api/user/<string:id>", methods=["PUT"])
+def edit_user(id):
+    data = request.json
 
-  user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
+    print("user",user)
+    print("data", data)
 
-  if user:
-    user.picture = new_picture
-    db.session.commit()
-    return jsonify({'message': 'Picture updated sucessfully'})
-  else:
-    return jsonify({'error': 'User not found'}), 404
+    if user:
+        # Update user attributes based on the provided data
+        for key, value in data.items():
+            setattr(user, key, value)
+
+        db.session.commit()
+        return jsonify({'message': 'User Updated'})
+    else:
+        return jsonify({'error': 'User not found'}), 404
 
 if __name__ == "__main__":
     app.run(debug=False)

@@ -92,7 +92,8 @@ const columnsPeople = [
   {
     accessorKey: "edit",
     header: " ",
-    cell: ({ row }) => h(EditButton, { id: row.original.id }),
+    cell: ({ row }) =>
+      h(EditButton, { id: row.original.id, rowData: row.original }),
   },
 ];
 
