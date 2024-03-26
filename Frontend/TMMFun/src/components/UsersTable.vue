@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import people from "../mockDataPeople.json";
 import { h, ref } from "vue";
 import {
   useVueTable,
@@ -15,19 +14,24 @@ import { useQuery } from "@tanstack/vue-query";
 import { getUsers } from "../../services/apiClient.ts";
 import { onMounted } from "vue";
 
-const data = ref(people);
+const queryData = ref([]);
 
-const queryData = ref(null);
+// Define an asynchronous function to fetch people data
+const fetchPeople = async () => {
+  try {
+    // Fetch data from the API
+    const response = await getUsers();
 
-// Fetch data on component mount
-onMounted(async () => {
-  const { data: fetchedData } = await useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers(),
-  });
-  queryData.value = fetchedData;
-  console.log("query", queryData.value);
-});
+    // Parse the JSON response
+
+    queryData.value = response.data;
+  } catch (error) {
+    console.error("Error fetching people data:", error);
+  }
+};
+
+// Call fetchPeople function when the component is mounted
+onMounted(fetchPeople);
 
 const columnsPeople = [
   {
@@ -81,10 +85,10 @@ const columnsPeople = [
   //   accessorKey: "bio",
   //   header: "Bio",
   // },
-  // {
-  //   accessorKey: "id",
-  //   header: "ID",
-  // },
+  {
+    accessorKey: "id",
+    header: "ID",
+  },
   {
     accessorKey: "edit",
     header: " ",
@@ -96,7 +100,9 @@ const sorting = ref([]);
 const filter = ref("");
 
 const table = useVueTable({
-  data: queryData.value || data.value,
+  get data() {
+    return queryData.value;
+  },
   columns: columnsPeople,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
