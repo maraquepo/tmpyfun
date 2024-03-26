@@ -13,16 +13,20 @@ import { format } from "date-fns";
 import EditButton from "./EditButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { getUsers } from "../../services/apiClient.ts";
+import { onMounted } from "vue";
 
 const data = ref(people);
 
-const {
-  status,
-  data: queryData,
-  error,
-} = useQuery({
-  queryKey: ["users"],
-  queryFn: getUsers(),
+const queryData = ref(null);
+
+// Fetch data on component mount
+onMounted(async () => {
+  const { data: fetchedData } = await useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers(),
+  });
+  queryData.value = fetchedData;
+  console.log("query", queryData.value);
 });
 
 const columnsPeople = [
@@ -92,7 +96,7 @@ const sorting = ref([]);
 const filter = ref("");
 
 const table = useVueTable({
-  data: queryData || data.value,
+  data: queryData.value || data.value,
   columns: columnsPeople,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),

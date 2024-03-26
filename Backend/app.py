@@ -2,6 +2,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 SELECT_5 = (
   'SELECT id, fullname, passwordhash, institution, bio, creator_user_id, public_user_id, picture, email, "signupIP", "createdAt", "updatedAt", "tokenBalance" FROM "Users" ORDER BY "createdAt" LIMIT 5'
@@ -14,6 +15,7 @@ SELECT_ALL_OLDEST_FIRST = (
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 url = os.getenv("DATABASE_URL")
 connection = psycopg2.connect(url)
 
