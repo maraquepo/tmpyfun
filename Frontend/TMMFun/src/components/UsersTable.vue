@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Make sure this block is also TypeScript
 import people from "../mockDataPeople.json";
 import { h, ref } from "vue";
 import {
@@ -12,8 +11,19 @@ import {
 } from "@tanstack/vue-table";
 import { format } from "date-fns";
 import EditButton from "./EditButton.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { getUsers } from "../../services/apiClient.ts";
 
 const data = ref(people);
+
+const {
+  status,
+  data: queryData,
+  error,
+} = useQuery({
+  queryKey: ["users"],
+  queryFn: getUsers(),
+});
 
 const columnsPeople = [
   {
@@ -37,6 +47,7 @@ const columnsPeople = [
   {
     accessorKey: "picture",
     header: "Picture",
+    enableResizing: true,
   },
   {
     accessorKey: "tokenBalance",
@@ -54,10 +65,10 @@ const columnsPeople = [
   //   accessorKey: "passwordhash",
   //   header: "Password Hash",
   // },
-  {
-    accessorKey: "signupIP",
-    header: "Signup IP",
-  },
+  // {
+  //   accessorKey: "signupIP",
+  //   header: "Signup IP",
+  // },
   // {
   //   accessorKey: "institution",
   //   header: "Instituiton",
@@ -66,10 +77,10 @@ const columnsPeople = [
   //   accessorKey: "bio",
   //   header: "Bio",
   // },
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
+  // {
+  //   accessorKey: "id",
+  //   header: "ID",
+  // },
   {
     accessorKey: "edit",
     header: " ",
@@ -81,7 +92,7 @@ const sorting = ref([]);
 const filter = ref("");
 
 const table = useVueTable({
-  data: data.value,
+  data: queryData || data.value,
   columns: columnsPeople,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
@@ -116,9 +127,9 @@ export default {
 </script>
 
 <template>
-  <div class="px-4 sm:px-6 lg:px-8">
+  <div class="px-4 sm:px-6">
     <div class="mt-8 flow-root">
-      <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <div class="my-4">
             <input
@@ -141,6 +152,7 @@ export default {
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   :class="{
                     'cursor-pointer select-none': header.column.getCanSort(),
+                    'w-20': header.column.id === 'picture', // Adjust width as per your requirement
                   }"
                   @click="header.column.getToggleSortingHandler()?.($event)"
                 >
@@ -159,6 +171,9 @@ export default {
                   v-for="cell in row.getVisibleCells()"
                   :key="cell.id"
                   class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                  :class="{
+                    'w-20': cell.column.id === 'picture', // Adjust width as per your requirement
+                  }"
                 >
                   <FlexRender
                     :render="cell.column.columnDef.cell"
