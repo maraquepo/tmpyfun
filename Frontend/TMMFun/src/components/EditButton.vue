@@ -53,103 +53,53 @@ const submitForm = async () => {
 };
 </script>
 
-Got it! We can achieve a two-column layout using flexbox. Here's the updated
-code to display the form inputs in two columns: html Copy code
 <template>
   <div>
-    <button @click="handleClick">Edit</button>
-    <div v-if="isModalOpen" class="modal-wrapper">
-      <div class="modal-content">
-        <h2>Edit {{ props.rowData.fullname }}</h2>
+    <button
+      @click="handleClick"
+      class="px-4 py-2 bg-blue-500 text-white rounded-md"
+    >
+      Edit
+    </button>
+    <div
+      v-if="isModalOpen"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 class="text-xl font-bold mb-4">
+          Edit {{ props.rowData.fullname }}
+        </h2>
+        <!-- <img :src="props.rowData.picture" /> -->
         <div
           class="form-group"
           v-for="(value, key) in props.rowData"
           :key="key"
         >
-          <div class="input-group">
-            <label class="label" :for="key">{{ key }}:</label>
+          <div class="input-group flex mb-4">
+            <label class="label flex-none w-28">{{ key }}:</label>
             <input
               v-model="formValues[key]"
               :id="key"
               :name="key"
-              class="input"
+              class="input flex-auto border rounded-md p-2"
             />
           </div>
         </div>
-        <div class="buttons">
-          <button @click="submitForm" class="btn-update">Update</button>
-          <button @click="closeModal" class="btn-cancel">Cancel</button>
+        <div class="buttons flex justify-end">
+          <button
+            @click="submitForm"
+            class="btn-update px-4 py-2 bg-green-500 text-white rounded-md mr-4"
+          >
+            Update
+          </button>
+          <button
+            @click="closeModal"
+            class="btn-cancel px-4 py-2 bg-red-500 text-white rounded-md"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.modal-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-content {
-  background-color: darkgrey;
-  padding: 20px;
-  border-radius: 5px;
-  width: 400px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-}
-
-.label {
-  flex: 1;
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.input {
-  flex: 2;
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.btn-update,
-.btn-cancel {
-  padding: 8px 16px;
-  margin-left: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-update {
-  background-color: #4caf50;
-  color: white;
-}
-
-.btn-cancel {
-  background-color: #f44336;
-  color: white;
-}
-</style>
