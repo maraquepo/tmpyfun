@@ -7,10 +7,12 @@ import PeopleTable from "./UsersTable.vue";
 </script>
 
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
+  <div class="py-3 px-5">
+    <h1 class="text-green-400">{{ msg }}</h1>
   </div>
-  <PeopleTable />
+  <div class="min-h-screen">
+    <PeopleTable />
+  </div>
 </template>
 
 <style scoped>

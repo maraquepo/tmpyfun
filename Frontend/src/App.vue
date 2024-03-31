@@ -4,7 +4,7 @@ import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
 <template>
-  <div class="main">
+  <div class="bg-zinc-900">
     <HelloWorld msg="Users" />
 
     <!-- <nav>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from "vue";
+import { h, ref, onMounted } from "vue";
 import {
   useVueTable,
   getCoreRowModel,
@@ -7,22 +7,19 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   getFilteredRowModel,
+  RowSelection,
 } from "@tanstack/vue-table";
 import { format } from "date-fns";
 import EditButton from "./EditButton.vue";
+import CheckBox from "./CheckBox.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { getUsers } from "../../services/apiClient.ts";
-import { onMounted } from "vue";
 
 const queryData = ref([]);
 
-// Define an asynchronous function to fetch people data
 const fetchPeople = async () => {
   try {
-    // Fetch data from the API
     const response = await getUsers();
-
-    // Parse the JSON response
 
     queryData.value = response.data;
   } catch (error) {
@@ -30,12 +27,36 @@ const fetchPeople = async () => {
   }
 };
 
-// Call fetchPeople function when the component is mounted
 onMounted(fetchPeople);
 
 const columnsPeople = [
   {
-    accessorKey: "fullname", // Assuming the ID is the first element
+    id: "select",
+    header: ({ table }: { table: any }) =>
+      h(CheckBox, {
+        checked: table.getIsAllRowsSelected(),
+        indeterminate: table.getIsSomeRowsSelected(),
+        onChange: table.getToggleAllRowsSelectedHandler(),
+      }),
+    cell: ({ row }: { row: any }) =>
+      h(CheckBox, {
+        checked: row.getIsSelected(),
+        disabled: !row.getCanSelect(),
+        onChange: row.getToggleSelectedHandler(),
+      }),
+  },
+  // {
+  //   id: "select",
+  //   header: ({ table }: { table: any }) =>
+  //     h("input", {
+  //       type: "checkbox",
+  //       checked: table.getIsAllRowsSelected(),
+  //       onChange: table.getToggleAllRowsSelectedHandler(),
+  //     }),
+  //   cell: ({ row }: { row: any }) => h("input", { type: "checkbox" }),
+  // },
+  {
+    accessorKey: "fullname",
     header: "Full Name",
   },
   {
@@ -46,49 +67,31 @@ const columnsPeople = [
     accessorKey: "createdAt",
     header: "Created At",
     cell: (info) => format(new Date(info.getValue()), "MMM d, yyyy"),
+    sortType: "datetime",
   },
   {
     accessorKey: "updatedAt",
     header: "Updated At",
     cell: (info) => format(new Date(info.getValue()), "MMM d, yyyy"),
+    sortType: "datetime",
   },
   {
     accessorKey: "picture",
     header: "Picture",
-    enableResizing: true,
+    cell: (info) =>
+      h("img", {
+        src: info.getValue(),
+        class: "rounded-full w-10 h-10 object-cover",
+      }),
   },
   {
     accessorKey: "tokenBalance",
     header: "Token Balance",
   },
   // {
-  //   accessorKey: "public_user_id",
-  //   header: "Public User ID",
+  //   accessorKey: "id",
+  //   header: "ID",
   // },
-  // {
-  //   accessorKey: "creator_user_id", // Name
-  //   header: "Creator User ID",
-  // },
-  // {
-  //   accessorKey: "passwordhash",
-  //   header: "Password Hash",
-  // },
-  // {
-  //   accessorKey: "signupIP",
-  //   header: "Signup IP",
-  // },
-  // {
-  //   accessorKey: "institution",
-  //   header: "Instituiton",
-  // },
-  // {
-  //   accessorKey: "bio",
-  //   header: "Bio",
-  // },
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
   {
     accessorKey: "edit",
     header: " ",
@@ -99,6 +102,7 @@ const columnsPeople = [
 
 const sorting = ref([]);
 const filter = ref("");
+const rowSelection = ref<RowSelection>({});
 
 const table = useVueTable({
   get data() {
@@ -109,12 +113,21 @@ const table = useVueTable({
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
+  enableRowSelection: true,
+  initialState: {
+    pagination: {
+      pageSize: 7,
+    },
+  },
   state: {
     get sorting() {
       return sorting.value;
     },
     get globalFilter() {
       return filter.value;
+    },
+    get rowSelection() {
+      return rowSelection.value;
     },
   },
   onSortingChange: (updaterOrValue) => {
@@ -123,11 +136,12 @@ const table = useVueTable({
         ? updaterOrValue(sorting.value)
         : updaterOrValue;
   },
-  // initialState: {
-  //   pagination: {
-  //     pageSize: 10,
-  //   },
-  // },
+  onRowSelectionChange: (updateOrValue) => {
+    rowSelection.value =
+      typeof updateOrValue === "function"
+        ? updateOrValue(rowSelection.value)
+        : updateOrValue;
+  },
 });
 </script>
 
@@ -139,10 +153,10 @@ export default {
 
 <template>
   <div class="px-4 sm:px-6">
-    <div class="mt-8 flow-root">
+    <div class="block">
       <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="my-4">
+          <div class="my-1">
             <input
               type="text"
               class="border border-gray-400 rounded px-2 py-2"
@@ -150,7 +164,7 @@ export default {
               v-model="filter"
             />
           </div>
-          <table class="min-w-full divide-y divide-gray-300">
+          <table class="w-full text-left divide-y divide-gray-300">
             <thead>
               <tr
                 v-for="headerGroup in table.getHeaderGroups()"
@@ -160,11 +174,7 @@ export default {
                   v-for="header in headerGroup.headers"
                   :key="header.id"
                   scope="col"
-                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  :class="{
-                    'cursor-pointer select-none': header.column.getCanSort(),
-                    'w-20': header.column.id === 'picture', // Adjust width as per your requirement
-                  }"
+                  class="px-3 py-3.5 text-left text-sm font-semibold text-green-400"
                   @click="header.column.getToggleSortingHandler()?.($event)"
                 >
                   <FlexRender
@@ -181,10 +191,7 @@ export default {
                 <td
                   v-for="cell in row.getVisibleCells()"
                   :key="cell.id"
-                  class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
-                  :class="{
-                    'w-20': cell.column.id === 'picture', // Adjust width as per your requirement
-                  }"
+                  class="px-3 py-4 text-sm text-ellipsis text-gray-500 overflow-hidden"
                 >
                   <FlexRender
                     :render="cell.column.columnDef.cell"
@@ -196,26 +203,26 @@ export default {
           </table>
         </div>
       </div>
-      <div class="mt-8">
+      <div class="mt-8 text-green-400">
         Page {{ table.getState().pagination.pageIndex + 1 }} of
         {{ table.getPageCount() }} -
         {{ table.getFilteredRowModel().rows.length }} results
       </div>
       <div class="mt-8 space-x-4">
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed text-green-400"
           @click="table.setPageSize(5)"
         >
           Page Size 5
         </button>
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="table.setPageSize(10)"
         >
           Page Size 10
         </button>
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="table.setPageSize(20)"
         >
           Page Size 20
@@ -223,26 +230,26 @@ export default {
       </div>
       <div class="space-x-4 mt-8">
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="table.setPageIndex(0)"
         >
           First page
         </button>
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="table.setPageIndex(table.getPageCount() - 1)"
         >
           Last page
         </button>
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
           Prev page
         </button>
         <button
-          class="border border-gray-300 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border border-green-400 text-green-400 rounded px-2 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >

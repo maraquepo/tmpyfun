@@ -57,7 +57,7 @@ const submitForm = async () => {
   <div>
     <button
       @click="handleClick"
-      class="px-4 py-2 bg-blue-500 text-white rounded-md"
+      class="px-4 py-2 border-green-400 border text-green-400 rounded-md"
     >
       Edit
     </button>
