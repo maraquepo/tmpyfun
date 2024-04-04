@@ -1,10 +1,11 @@
 import { defineProps } from 'vue';
 <script setup lang="ts">
 import { ref, defineProps, watch } from "vue";
-import { deleteUsers } from "../../services/apiClient";
+import { deleteUsers, updateUsersPictureURL } from "../../services/apiClient";
 
 const isModalOpen = ref(false);
 const selectedRows = ref([]);
+const newPictureURL = ref("");
 
 const openModal = () => {
   isModalOpen.value = true;
@@ -25,6 +26,16 @@ const deleteMultiUsers = async () => {
     closeModal();
   } catch (error) {
     console.error("Error deleting users:", error);
+  }
+};
+
+const updatePictureURLsOfSelectedUsers = async () => {
+  const userIDs = selectedRows.value.map((user) => user.original.id);
+  try {
+    await updateUsersPictureURL(userIDs, newPictureURL.value);
+    closeModal();
+  } catch (error) {
+    console.error("Error updating picture URLs:", error);
   }
 };
 
@@ -73,7 +84,11 @@ const grabCreatorUserId = (users) => {
           </ul>
         </div>
         <div class="input-group flex mb-4">
-          <input class="input flex-auto border rounded-md" />
+          <input
+            v-model="newPictureURL"
+            class="input flex-auto border rounded-md"
+            placeholder="New Picture URL"
+          />
         </div>
         <div class="buttons flex justify-end">
           <button
@@ -84,6 +99,7 @@ const grabCreatorUserId = (users) => {
           </button>
           <button
             class="btn-update px-4 py-2 text-green-400 border border-green-400 rounded-md mr-4"
+            @click="updatePictureURLsOfSelectedUsers"
           >
             Change Picture
           </button>

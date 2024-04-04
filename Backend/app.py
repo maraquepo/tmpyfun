@@ -80,5 +80,26 @@ def delete_multiple_users():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route("/api/users/update-picture-url", methods=["PUT"])
+def update_multiple_users_picture_url():
+    data = request.json
+    user_ids = data.get("userIDs", [])
+    new_picture_url = data.get("newPictureURL", "")
+
+    if not user_ids:
+        return jsonify({'error': 'No user IDs provided'}), 400
+
+    if not new_picture_url:
+        return jsonify({'error': 'New picture URL cannot be empty'}), 400
+
+    try:
+        updated_count = User.query.filter(User.id.in_(user_ids)).update({User.picture: new_picture_url}, synchronize_session=False)
+        db.session.commit()
+
+        return jsonify({'message': f'Updated {updated_count} user picture URLs'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=False)

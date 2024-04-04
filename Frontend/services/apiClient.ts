@@ -14,3 +14,11 @@ export const editUser = (id, data) => {
 export const deleteUsers = (userIDs) => {
   return useAxios.delete(`/users/delete`, { data: { userIDs: userIDs } });
 };
+
+export const updateUsersPictureURL = async (userIDs, newPictureURL) => {
+  try {
+    await useAxios.put("/users/update-picture-url", { userIDs, newPictureURL });
+  } catch (error) {
+    throw new Error("Error updating picture URLs:", error);
+  }
+};
