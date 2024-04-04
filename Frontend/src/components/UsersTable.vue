@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref, onMounted } from "vue";
+import { h, ref, onMounted, watch } from "vue";
 import {
   useVueTable,
   getCoreRowModel,
@@ -156,7 +156,7 @@ export default {
               v-model="filter"
             />
             <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
-              <EditOrDeleteModal />
+              <EditOrDeleteModal :user="table.getSelectedRowModel().flatRows" />
             </div>
           </div>
           <table class="w-full text-left divide-y divide-gray-300">

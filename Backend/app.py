@@ -63,5 +63,22 @@ def edit_user(id):
     else:
         return jsonify({'error': 'User not found'}), 404
 
+@app.route("/api/users/delete", methods=["DELETE"])
+def delete_multiple_users():
+    data = request.json
+    user_ids = data.get("userIDs", [])
+
+    if not user_ids:
+        return jsonify({'error': 'No user IDs provided'}), 400
+
+    try:
+        deleted_count = User.query.filter(User.id.in_(user_ids)).delete()
+        db.session.commit()
+
+        return jsonify({'message': f'{deleted_count} users deleted'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == "__main__":
     app.run(debug=False)
