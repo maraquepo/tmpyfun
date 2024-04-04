@@ -2,7 +2,7 @@
 import { ref, toRefs } from "vue";
 
 const props = defineProps<{
-  indeterminate: boolean;
+  indeterminate?: boolean;
   className?: string;
 }>();
 

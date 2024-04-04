@@ -8,10 +8,12 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   RowSelection,
+  type RowSelectionState,
 } from "@tanstack/vue-table";
 import { format } from "date-fns";
 import EditButton from "./EditButton.vue";
 import CheckBox from "./CheckBox.vue";
+import EditOrDeleteModal from "./EditOrDeleteModal.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { getUsers } from "../../services/apiClient.ts";
 
@@ -45,16 +47,6 @@ const columnsPeople = [
         onChange: row.getToggleSelectedHandler(),
       }),
   },
-  // {
-  //   id: "select",
-  //   header: ({ table }: { table: any }) =>
-  //     h("input", {
-  //       type: "checkbox",
-  //       checked: table.getIsAllRowsSelected(),
-  //       onChange: table.getToggleAllRowsSelectedHandler(),
-  //     }),
-  //   cell: ({ row }: { row: any }) => h("input", { type: "checkbox" }),
-  // },
   {
     accessorKey: "fullname",
     header: "Full Name",
@@ -102,7 +94,7 @@ const columnsPeople = [
 
 const sorting = ref([]);
 const filter = ref("");
-const rowSelection = ref<RowSelection>({});
+const rowSelection = ref<RowSelectionState>({});
 
 const table = useVueTable({
   get data() {
@@ -156,13 +148,16 @@ export default {
     <div class="block">
       <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-          <div class="my-1">
+          <div class="my-1 flex">
             <input
               type="text"
               class="border border-gray-400 rounded px-2 py-2"
               placeholder="Search"
               v-model="filter"
             />
+            <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
+              <EditOrDeleteModal />
+            </div>
           </div>
           <table class="w-full text-left divide-y divide-gray-300">
             <thead>

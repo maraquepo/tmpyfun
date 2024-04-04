@@ -69,7 +69,6 @@ const submitForm = async () => {
         <h2 class="text-xl font-bold mb-4">
           Edit {{ props.rowData.fullname }}
         </h2>
-        <!-- <img :src="props.rowData.picture" /> -->
         <div
           class="form-group"
           v-for="(value, key) in props.rowData"
