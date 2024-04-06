@@ -24,6 +24,7 @@ const deleteMultiUsers = async () => {
   try {
     await deleteUsers(userIDs);
     closeModal();
+    await props.fetchPeople();
   } catch (error) {
     console.error("Error deleting users:", error);
   }
@@ -34,28 +35,31 @@ const updatePictureURLsOfSelectedUsers = async () => {
   try {
     await updateUsersPictureURL(userIDs, newPictureURL.value);
     closeModal();
+    await props.fetchPeople();
   } catch (error) {
     console.error("Error updating picture URLs:", error);
   }
 };
 
 const props = defineProps({
-  user: Object,
+  user: Array,
+  fetchPeople: Function,
 });
-
-watch(
-  () => props.user,
-  (newValue) => {
-    console.log("User object updated:", newValue);
-    selectedRows.value = newValue;
-    grabCreatorUserId(newValue);
-  }
-);
 
 const grabCreatorUserId = (users) => {
   const creatorIds = users.map((user) => user.original.creator_user_id);
   console.log("Creator User IDs:", creatorIds);
 };
+
+watch(
+  () => props.user,
+  (newValue) => {
+    console.log("User object updated:", newValue);
+    selectedRows.value = Array.isArray(newValue) ? newValue : [newValue];
+    console.log("Selected rows:", selectedRows.value);
+    grabCreatorUserId(selectedRows.value);
+  }
+);
 </script>
 
 <template>
@@ -70,9 +74,11 @@ const grabCreatorUserId = (users) => {
       v-if="isModalOpen"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
     >
-      <div class="modal-content bg-zinc-900 rounded-lg shadow-lg p-6 w-100">
+      <div
+        class="modal-content bg-zinc-900 rounded-lg shadow-lg p-6 w-100 max-h-80 overflow-y-auto"
+      >
         <h2 class="text-xl font-bold mb-4 text-green-400">Troll</h2>
-        <div v-if="selectedRows.length > 0" class="my-5">
+        <div v-if="selectedRows.length !== 0" class="my-5">
           <ul>
             <li
               v-for="(user, index) in selectedRows"

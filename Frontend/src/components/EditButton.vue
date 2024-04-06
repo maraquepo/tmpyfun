@@ -12,6 +12,7 @@ type RowData = Record<string, string | number | boolean | null>;
 const props = defineProps({
   id: String,
   rowData: Object as () => RowData,
+  fetchPeople: Function,
 });
 
 const isModalOpen = ref(false);
@@ -47,6 +48,7 @@ const submitForm = async () => {
 
     console.log("Form submitted successfully.");
     closeModal();
+    await props.fetchPeople();
   } catch (error) {
     console.error("Error submitting form:", error);
   }

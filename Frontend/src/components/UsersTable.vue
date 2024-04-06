@@ -56,6 +56,10 @@ const columnsPeople = [
     header: "Email",
   },
   {
+    accessorKey: "signupIP",
+    header: "Signup IP",
+  },
+  {
     accessorKey: "createdAt",
     header: "Created At",
     cell: (info) => format(new Date(info.getValue()), "MMM d, yyyy"),
@@ -88,7 +92,11 @@ const columnsPeople = [
     accessorKey: "edit",
     header: " ",
     cell: ({ row }) =>
-      h(EditButton, { id: row.original.id, rowData: row.original }),
+      h(EditButton, {
+        id: row.original.id,
+        rowData: row.original,
+        fetchPeople: fetchPeople,
+      }),
   },
 ];
 
@@ -107,6 +115,7 @@ const table = useVueTable({
   getFilteredRowModel: getFilteredRowModel(),
   enableRowSelection: true,
   initialState: {
+    rowSelection: rowSelection.value,
     pagination: {
       pageSize: 7,
     },
@@ -156,7 +165,10 @@ export default {
               v-model="filter"
             />
             <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
-              <EditOrDeleteModal :user="table.getSelectedRowModel().flatRows" />
+              <EditOrDeleteModal
+                :user="table.getSelectedRowModel().flatRows"
+                :fetch-people="fetchPeople"
+              />
             </div>
           </div>
           <table class="w-full text-left divide-y divide-gray-300">
