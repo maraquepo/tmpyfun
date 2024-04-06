@@ -63,7 +63,7 @@ watchEffect(() => {
       <div
         class="modal-content bg-zinc-900 rounded-lg shadow-lg p-6 w-100 max-h-80 overflow-y-auto"
       >
-        <h2 class="text-xl font-bold mb-4 text-green-400">Troll</h2>
+        <div class="text-8xl font-bold mb-4 text-green-400">Troll</div>
         <div v-if="selectedRows.length !== 0" class="my-5">
           <ul>
             <li

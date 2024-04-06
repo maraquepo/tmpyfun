@@ -60,8 +60,9 @@ const columnsPeople = [
     header: "Email",
   },
   {
-    accessorKey: "signupIP",
-    header: "Signup IP",
+    accessorKey: "verifiedDT",
+    header: "Verified",
+    cell: (info) => (info.getValue() ? "Yes" : "No"),
   },
   {
     accessorKey: "createdAt",

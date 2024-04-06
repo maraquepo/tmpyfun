@@ -3,12 +3,16 @@ import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
+  <!-- <div class="py-2 px-5">
+    <div class="text-8xl text-red-700">Wreck It</div>
+  </div> -->
   <header>
     <div class="bg-zinc-900">
       <nav>
         <RouterLink to="/" class="nav-link">Users</RouterLink>
         <RouterLink to="/teams" class="nav-link">Teams</RouterLink>
         <RouterLink to="/coupons" class="nav-link">Coupons</RouterLink>
+        <RouterLink to="/reviews" class="nav-link">Reviews</RouterLink>
       </nav>
     </div>
   </header>
@@ -18,7 +22,7 @@ import { RouterLink, RouterView } from "vue-router";
 
 <style scoped>
 header {
-  line-height: 1.5;
+  line-height: 1;
   max-height: 100vh;
 }
 

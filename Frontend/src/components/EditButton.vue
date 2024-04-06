@@ -67,8 +67,8 @@ const submitForm = async () => {
       v-if="isModalOpen"
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
     >
-      <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-96">
-        <h2 class="text-xl font-bold mb-4">
+      <div class="modal-content bg-zinc-900 rounded-lg shadow-lg p-6 w-96">
+        <h2 class="text-xl font-bold mb-4 text-green-400">
           Edit {{ props.rowData.fullname }}
         </h2>
         <div
@@ -77,7 +77,9 @@ const submitForm = async () => {
           :key="key"
         >
           <div class="input-group flex mb-4">
-            <label class="label flex-none w-28">{{ key }}:</label>
+            <label class="label flex-none w-28 text-green-400"
+              >{{ key }}:</label
+            >
             <input
               v-model="formValues[key]"
               :id="key"
@@ -89,13 +91,13 @@ const submitForm = async () => {
         <div class="buttons flex justify-end">
           <button
             @click="submitForm"
-            class="btn-update px-4 py-2 bg-green-500 text-white rounded-md mr-4"
+            class="btn-update px-4 py-2 text-green-400 border border-green-400 rounded-md mr-4"
           >
             Update
           </button>
           <button
             @click="closeModal"
-            class="btn-cancel px-4 py-2 bg-red-500 text-white rounded-md"
+            class="btn-cancel px-4 py-2 text-red-500 border border-red-500 rounded-md"
           >
             Cancel
           </button>
