@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { defineProps, ref } from "vue";
-import { editUser } from "../../services/apiClient.ts";
+import { editTeam } from "../../services/apiClient.ts";
 
-interface User {
+interface Team {
   [key: string]: string | number;
 }
 
@@ -16,12 +16,12 @@ const props = defineProps({
 });
 
 const isModalOpen = ref(false);
-let userId: string | null = null;
-const formValues = ref<User>({});
+let teamId: string | null = null;
+const formValues = ref<Team>({});
 
 const openModal = (id: string) => {
   isModalOpen.value = true;
-  userId = id;
+  teamId = id;
   // Reset formValues when opening modal
   formValues.value = { ...props.rowData };
 };
@@ -38,13 +38,13 @@ const closeModal = () => {
 
 const submitForm = async () => {
   try {
-    if (!userId) return;
+    if (!teamId) return;
 
-    console.log("Submitting form with userId:", userId);
+    console.log("Submitting form with teamId:", teamId);
     console.log("Form values:", formValues.value);
 
     // Call editUser function directly
-    await editUser(userId, formValues.value);
+    await editTeam(teamId, formValues.value);
 
     console.log("Form submitted successfully.");
     closeModal();
@@ -68,9 +68,7 @@ const submitForm = async () => {
       class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
     >
       <div class="modal-content bg-white rounded-lg shadow-lg p-6 w-96">
-        <h2 class="text-xl font-bold mb-4">
-          Edit {{ props.rowData.fullname }}
-        </h2>
+        <h2 class="text-xl font-bold mb-4">Edit {{ props.rowData.title }}</h2>
         <div
           class="form-group"
           v-for="(value, key) in props.rowData"

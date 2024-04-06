@@ -1,15 +1,11 @@
-<template>
-  <div class="about">
-    <h1>This is for teams</h1>
-  </div>
-</template>
+<script setup lang="ts">
+import TeamsTable from "../components/TeamsTable.vue";
+</script>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
+<template>
+  <main>
+    <div class="min-h-screen w-full">
+      <TeamsTable />
+    </div>
+  </main>
+</template>

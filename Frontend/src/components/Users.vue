@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
 import PeopleTable from "./UsersTable.vue";
-const props = defineProps({
-  msg: String,
-});
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen w-full">
     <PeopleTable />
   </div>
 </template>

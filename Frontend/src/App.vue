@@ -8,6 +8,7 @@ import { RouterLink, RouterView } from "vue-router";
       <nav>
         <RouterLink to="/" class="nav-link">Users</RouterLink>
         <RouterLink to="/teams" class="nav-link">Teams</RouterLink>
+        <RouterLink to="/coupon" class="nav-link">Coupons</RouterLink>
       </nav>
     </div>
   </header>
@@ -74,7 +75,7 @@ nav a:first-of-type {
 
   nav {
     text-align: left;
-    margin-left: 5.5rem;
+    margin-left: 0.2rem;
     font-size: 1rem;
 
     padding: 1rem 0;

@@ -4,6 +4,6 @@ import Users from "../components/Users.vue";
 
 <template>
   <main>
-    <Users class="bg-zinc-900" msg="Users" />
+    <Users />
   </main>
 </template>

@@ -35,6 +35,23 @@ class User(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+class Team(db.Model):
+    __tablename__ = 'Teams'
+
+    id = db.Column(db.String, primary_key=True)
+    title = db.Column(db.String())
+    type = db.Column(db.String())
+    public_team_id = db.Column(db.String())
+    picture = db.Column(db.String())
+    createdAt = db.Column(db.DateTime)
+    updatedAt = db.Column(db.DateTime)
+    creatorId = db.Column(db.String(), db.ForeignKey('Users.id'))
+
+    creator = db.relationship('User', backref='teams')
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 @app.route("/api/users")
 def get_all_users():
     users = User.query.order_by(desc(User.createdAt)).all()
@@ -62,6 +79,24 @@ def edit_user(id):
         return jsonify({'message': 'User Updated'})
     else:
         return jsonify({'error': 'User not found'}), 404
+
+@app.route("/api/team/<string:id>", methods=["PUT"])
+def edit_team(id):
+    data = request.json
+
+    team = Team.query.filter_by(id=id).first()
+
+    print("team", team)
+    print("data", data)
+    if team:
+        # Update team attributes based on the provided data
+        for key, value in data.items():
+            setattr(team, key, value)
+
+        db.session.commit()
+        return jsonify({'message': 'Team Updated'})
+    else:
+        return jsonify({'error': 'Team not found'}), 404
 
 @app.route("/api/users/delete", methods=["DELETE"])
 def delete_multiple_users():
@@ -100,6 +135,24 @@ def update_multiple_users_picture_url():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@app.route("/api/teams")
+def get_all_teams():
+    teams = db.session.query(
+        Team.id,
+        Team.title,
+        Team.type,
+        Team.picture,
+        Team.createdAt,
+        Team.updatedAt,
+        Team.creatorId,
+        Team.public_team_id,
+        User.fullname
+    ).join(User).filter(
+        Team.creatorId.isnot(None)
+    ).order_by(Team.createdAt).all()
+
+    return jsonify([dict(zip(['id','title', 'type', 'picture', 'createdAt', 'updatedAt', 'creatorId', 'public_team_id','creator_fullname'], team)) for team in teams])
 
 if __name__ == "__main__":
     app.run(debug=False)

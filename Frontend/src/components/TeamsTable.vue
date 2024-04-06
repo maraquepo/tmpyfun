@@ -10,27 +10,25 @@ import {
   RowSelection,
   type RowSelectionState,
 } from "@tanstack/vue-table";
-import { format } from "date-fns";
-import EditButton from "./EditButton.vue";
 import CheckBox from "./CheckBox.vue";
-import EditOrDeleteModal from "./EditOrDeleteModal.vue";
-import { getUsers } from "../../services/apiClient.ts";
+import EditButtonTwo from "./EditButtonTwo.vue";
+import { format } from "date-fns";
+import { getTeams } from "../../services/apiClient.ts";
 
 const queryData = ref([]);
 
-const fetchPeople = async () => {
+const fetchTeams = async () => {
   try {
-    const response = await getUsers();
-
-    queryData.value = response.data;
-  } catch (error) {
-    console.error("Error fetching people data:", error);
+    const res = await getTeams();
+    queryData.value = res.data;
+  } catch (err) {
+    console.error("Error fetching teams data:", error);
   }
 };
 
-onMounted(fetchPeople);
+onMounted(fetchTeams);
 
-const columnsPeople = [
+const columnsTeams = [
   {
     id: "select",
     header: ({ table }: { table: any }) =>
@@ -47,16 +45,20 @@ const columnsPeople = [
       }),
   },
   {
-    accessorKey: "fullname",
-    header: "Full Name",
+    accessorKey: "title",
+    header: "Team Name",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "creator_fullname",
+    header: "Creator",
   },
   {
-    accessorKey: "signupIP",
-    header: "Signup IP",
+    accessorKey: "public_team_id",
+    header: "Team ID",
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
   },
   {
     accessorKey: "createdAt",
@@ -80,21 +82,13 @@ const columnsPeople = [
       }),
   },
   {
-    accessorKey: "tokenBalance",
-    header: "Token Balance",
-  },
-  // {
-  //   accessorKey: "id",
-  //   header: "ID",
-  // },
-  {
     accessorKey: "edit",
     header: " ",
     cell: ({ row }) =>
-      h(EditButton, {
+      h(EditButtonTwo, {
         id: row.original.id,
         rowData: row.original,
-        fetchItems: fetchPeople,
+        fetchItems: fetchTeams,
       }),
   },
 ];
@@ -107,7 +101,7 @@ const table = useVueTable({
   get data() {
     return queryData.value;
   },
-  columns: columnsPeople,
+  columns: columnsTeams,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
@@ -147,7 +141,7 @@ const table = useVueTable({
 
 <script lang="ts">
 export default {
-  name: "PeopleTable",
+  name: "TeamsTable",
 };
 </script>
 
