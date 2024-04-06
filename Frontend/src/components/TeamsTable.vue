@@ -14,6 +14,7 @@ import CheckBox from "./CheckBox.vue";
 import EditButtonTwo from "./EditButtonTwo.vue";
 import { format } from "date-fns";
 import { getTeams } from "../../services/apiClient.ts";
+import EditOrDeleteModalTwo from "./EditOrDeleteModalTwo.vue";
 
 const queryData = ref([]);
 
@@ -158,9 +159,9 @@ export default {
               v-model="filter"
             />
             <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
-              <EditOrDeleteModal
-                :user="table.getSelectedRowModel().flatRows"
-                :fetch-people="fetchPeople"
+              <EditOrDeleteModalTwo
+                :teams="table.getSelectedRowModel().flatRows"
+                :fetch-teams="fetchTeams"
               />
             </div>
           </div>

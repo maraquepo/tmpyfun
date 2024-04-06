@@ -1,7 +1,7 @@
 import { defineProps } from 'vue';
 <script setup lang="ts">
 import { ref, defineProps, watchEffect } from "vue";
-import { deleteUsers, updateUsersPictureURL } from "../../services/apiClient";
+import { updateTeamsPictureURL } from "../../services/apiClient";
 
 const isModalOpen = ref(false);
 const selectedRows = ref([]);
@@ -19,43 +19,32 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
-const deleteMultiUsers = async () => {
-  const userIDs = selectedRows.value.map((user) => user.original.id);
+const updatePictureURLsOfSelectedTeams = async () => {
+  const teamIDs = selectedRows.value.map((team) => team.original.id);
   try {
-    await deleteUsers(userIDs);
+    await updateTeamsPictureURL(teamIDs, newPictureURL.value);
     closeModal();
-    await props.fetchPeople();
-  } catch (error) {
-    console.error("Error deleting users:", error);
-  }
-};
-
-const updatePictureURLsOfSelectedUsers = async () => {
-  const userIDs = selectedRows.value.map((user) => user.original.id);
-  try {
-    await updateUsersPictureURL(userIDs, newPictureURL.value);
-    closeModal();
-    await props.fetchPeople();
+    await props.fetchTeams();
   } catch (error) {
     console.error("Error updating picture URLs:", error);
   }
 };
 
 const props = defineProps({
-  user: Array,
-  fetchPeople: Function,
+  teams: Array,
+  fetchTeams: Function,
 });
 
-const grabCreatorUserId = (users) => {
-  const creatorIds = users.map((user) => user.original.creator_user_id);
-  console.log("Creator User IDs:", creatorIds);
+const grabTeamName = (teams) => {
+  const teamName = teams.map((team) => team.original.title);
+  console.log("Creator User IDs:", teamName);
 };
 
 watchEffect(() => {
-  console.log("User object updated:", props.user);
-  selectedRows.value = Array.isArray(props.user) ? props.user : [props.user];
+  console.log("User object updated:", props.teams);
+  selectedRows.value = Array.isArray(props.teams) ? props.teams : [props.teams];
   console.log("Selected rows:", selectedRows.value);
-  grabCreatorUserId(selectedRows.value);
+  grabTeamName(selectedRows.value);
 });
 </script>
 
@@ -65,7 +54,7 @@ watchEffect(() => {
       @click="handleClick"
       class="px-4 py-2 border-green-400 border text-green-400 rounded-md"
     >
-      Edit User
+      Edit Team
     </button>
     <div
       v-if="isModalOpen"
@@ -78,11 +67,11 @@ watchEffect(() => {
         <div v-if="selectedRows.length !== 0" class="my-5">
           <ul>
             <li
-              v-for="(user, index) in selectedRows"
+              v-for="(team, index) in selectedRows"
               :key="index"
               class="text-green-400"
             >
-              {{ user.original.fullname }}
+              {{ team.original.title }}
             </li>
           </ul>
         </div>
@@ -96,13 +85,7 @@ watchEffect(() => {
         <div class="buttons flex justify-end">
           <button
             class="btn-update px-4 py-2 text-green-400 border border-green-400 rounded-md mr-4"
-            @click="deleteMultiUsers"
-          >
-            Delete {{ selectedRows.length }}
-          </button>
-          <button
-            class="btn-update px-4 py-2 text-green-400 border border-green-400 rounded-md mr-4"
-            @click="updatePictureURLsOfSelectedUsers"
+            @click="updatePictureURLsOfSelectedTeams"
           >
             Change Picture
           </button>

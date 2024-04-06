@@ -136,6 +136,27 @@ def update_multiple_users_picture_url():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route("/api/teams/update-picture-url", methods=["PUT"])
+def update_multiple_teamss_picture_url():
+    data = request.json
+    team_ids = data.get("teamIDs", [])
+    new_picture_url = data.get("newPictureURL", "")
+
+    if not team_ids:
+        return jsonify({'error': 'No team IDs provided'}), 400
+
+    if not new_picture_url:
+        return jsonify({'error': 'New picture URL cannot be empty'}), 400
+
+    try:
+        updated_count = Team.query.filter(Team.id.in_(team_ids)).update({Team.picture: new_picture_url}, synchronize_session=False)
+        db.session.commit()
+
+        return jsonify({'message': f'Updated {updated_count} user picture URLs'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 @app.route("/api/teams")
 def get_all_teams():
     teams = db.session.query(

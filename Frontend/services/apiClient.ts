@@ -33,3 +33,11 @@ export const updateUsersPictureURL = async (userIDs, newPictureURL) => {
     throw new Error("Error updating picture URLs:", error);
   }
 };
+
+export const updateTeamsPictureURL = async (teamIDs, newPictureURL) => {
+  try {
+    await useAxios.put("/teams/update-picture-url", { teamIDs, newPictureURL });
+  } catch (error) {
+    throw new Error("Error updating picture URLs:", error);
+  }
+};
