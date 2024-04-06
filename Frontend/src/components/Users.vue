@@ -1,15 +1,12 @@
 <script setup lang="ts">
-defineProps<{
-  msg: string;
-}>();
-
+import { defineProps } from "vue";
 import PeopleTable from "./UsersTable.vue";
+const props = defineProps({
+  msg: String,
+});
 </script>
 
 <template>
-  <div class="py-3 px-5">
-    <h1 class="text-green-400">{{ msg }}</h1>
-  </div>
   <div class="min-h-screen">
     <PeopleTable />
   </div>

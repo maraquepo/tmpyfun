@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
 <template>
-  <div class="bg-zinc-900">
-    <HelloWorld msg="Users" />
+  <header>
+    <div class="bg-zinc-900">
+      <nav>
+        <RouterLink to="/" class="nav-link">Users</RouterLink>
+        <RouterLink to="/teams" class="nav-link">Teams</RouterLink>
+      </nav>
+    </div>
+  </header>
 
-    <!-- <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-    </nav> -->
-  </div>
+  <RouterView />
 </template>
 
 <style scoped>
@@ -30,24 +31,28 @@ nav {
   font-size: 12px;
   text-align: center;
   margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+  display: flex;
+  justify-content: center;
 }
 
 nav a {
   display: inline-block;
-  padding: 0 1rem;
+  padding: 0 1rem; /* Apply padding to all links */
   border-left: 1px solid var(--color-border);
+  font-size: 50px;
+  color: rgb(107 114 128);
 }
 
 nav a:first-of-type {
   border: 0;
+}
+
+.nav-link.router-link-exact-active {
+  color: rgb(52 211 153);
+}
+
+.nav-link.router-link-exact-active:hover {
+  background-color: transparent;
 }
 
 @media (min-width: 1024px) {
@@ -69,7 +74,7 @@ nav a:first-of-type {
 
   nav {
     text-align: left;
-    margin-left: -1rem;
+    margin-left: 5.5rem;
     font-size: 1rem;
 
     padding: 1rem 0;
