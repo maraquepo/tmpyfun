@@ -4,6 +4,14 @@ export const getUsers = () => {
   return useAxios.get("/users");
 };
 
+export const getTeams = () => {
+  return useAxios.get("/teams");
+};
+
+export const getCoupons = () => {
+  return useAxios.get("/coupons");
+};
+
 export const editUser = (id, data) => {
   console.log("Editing user with ID:", id);
   console.log("Data:", data);
@@ -20,10 +28,6 @@ export const editTeam = (id: String, data: Object) => {
 
 export const deleteUsers = (userIDs) => {
   return useAxios.delete(`/users/delete`, { data: { userIDs: userIDs } });
-};
-
-export const getTeams = () => {
-  return useAxios.get("/teams");
 };
 
 export const updateUsersPictureURL = async (userIDs, newPictureURL) => {

@@ -19,6 +19,7 @@ db = SQLAlchemy(app)
 # TTL Cache configuration
 user_cache = TTLCache(maxsize=1000, ttl=1)
 team_cache = TTLCache(maxsize=1000, ttl=300)
+coupon_cache = TTLCache(maxsize=1000, ttl=300)
 
 class User(db.Model):
     __tablename__ = 'Users'
@@ -35,6 +36,7 @@ class User(db.Model):
     signupIP = db.Column(db.String())
     createdAt = db.Column(db.DateTime)
     updatedAt = db.Column(db.DateTime)
+    verifiedDT = db.Column(db.DateTime)
     tokenBalance = db.Column(db.Integer)
 
     def as_dict(self):
@@ -53,6 +55,20 @@ class Team(db.Model):
     creatorId = db.Column(db.String(), db.ForeignKey('Users.id'))
 
     creator = db.relationship('User', backref='teams')
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class Coupon(db.Model):
+    __tablename__ = 'Coupons'
+
+    promo_code = db.Column(db.String, primary_key=True)
+    number_of_tokens = db.Column(db.Integer)
+    expiration_date = db.Column(db.DateTime)
+    creation_date = db.Column(db.DateTime)
+    description = db.Column(db.String)
+    clicked_count = db.Column(db.Integer)
+    max_users = db.Column(db.Integer)
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -84,11 +100,21 @@ def fetch_teams():
         User.fullname
     ).join(User).filter(
         Team.creatorId.isnot(None)
-    ).order_by(Team.createdAt).all()
+    ).order_by(desc(Team.createdAt)).all()
 
     serialized_teams = [dict(zip(['id','title', 'type', 'picture', 'createdAt', 'updatedAt', 'creatorId', 'public_team_id','creator_fullname'], team)) for team in teams]
     team_cache["all_teams"] = serialized_teams
     return serialized_teams
+
+def fetch_coupons():
+    cached_coupons = coupon_cache.get("all_coupons")
+    if cached_coupons:
+        return cached_coupons
+
+    coupons = Coupon.query.all()
+    serialized_coupons = [coupon.as_dict() for coupon in coupons]
+    coupon_cache["all_coupons"] = serialized_coupons
+    return serialized_coupons
 
 # Routes
 
@@ -101,6 +127,11 @@ def get_all_users():
 def get_all_teams():
     teams = fetch_teams()
     return jsonify(teams)
+
+@app.route("/api/coupons")
+def get_all_coupons():
+    coupons = fetch_coupons()
+    return jsonify(coupons)
 
 @app.route("/api/oldusers")
 def get_old_users():

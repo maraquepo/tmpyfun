@@ -13,80 +13,55 @@ import {
 import CheckBox from "./CheckBox.vue";
 import EditButtonTwo from "./EditButtonTwo.vue";
 import { format } from "date-fns";
-import { getTeams } from "../../services/apiClient.ts";
-import EditOrDeleteModalTwo from "./EditOrDeleteModalTwo.vue";
+import { getCoupons } from "../../services/apiClient.ts";
 
 const queryData = ref([]);
 const dataFetched = ref(false);
 
-const fetchTeams = async () => {
+const fetchCoupons = async () => {
   try {
-    const res = await getTeams();
+    const res = await getCoupons();
     queryData.value = res.data;
     dataFetched.value = true;
   } catch (err) {
-    console.error("Error fetching teams data:", err);
+    console.error("Error fetching coupons data:", err);
   }
 };
 
 onMounted(() => {
   if (!dataFetched.value) {
-    fetchTeams();
+    fetchCoupons();
   }
 });
 
 const columnsTeams = [
   {
-    id: "select",
-    header: ({ table }: { table: any }) =>
-      h(CheckBox, {
-        checked: table.getIsAllRowsSelected(),
-        indeterminate: table.getIsSomeRowsSelected(),
-        onChange: table.getToggleAllRowsSelectedHandler(),
-      }),
-    cell: ({ row }: { row: any }) =>
-      h(CheckBox, {
-        checked: row.getIsSelected(),
-        disabled: !row.getCanSelect(),
-        onChange: row.getToggleSelectedHandler(),
-      }),
+    accessorKey: "promo_code",
+    header: "Coupon Name",
   },
   {
-    accessorKey: "title",
-    header: "Team Name",
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    accessorKey: "creator_fullname",
-    header: "Creator",
+    accessorKey: "number_of_tokens",
+    header: "Amount",
   },
   {
-    accessorKey: "public_team_id",
-    header: "Team ID",
+    accessorKey: "clicked_count",
+    header: "Clicks",
   },
   {
-    accessorKey: "type",
-    header: "Type",
-  },
-  {
-    accessorKey: "createdAt",
+    accessorKey: "creation_date",
     header: "Created At",
     cell: (info) => format(new Date(info.getValue()), "MMM d, yyyy"),
     sortType: "datetime",
   },
   {
-    accessorKey: "updatedAt",
-    header: "Updated At",
+    accessorKey: "expiration_date",
+    header: "Expired At",
     cell: (info) => format(new Date(info.getValue()), "MMM d, yyyy"),
     sortType: "datetime",
-  },
-  {
-    accessorKey: "picture",
-    header: "Picture",
-    cell: (info) =>
-      h("img", {
-        src: info.getValue(),
-        class: "rounded-full w-10 h-10 object-cover",
-      }),
   },
   {
     accessorKey: "edit",
@@ -95,7 +70,7 @@ const columnsTeams = [
       h(EditButtonTwo, {
         id: row.original.id,
         rowData: row.original,
-        fetchItems: fetchTeams,
+        fetchItems: fetchCoupons,
       }),
   },
 ];
@@ -161,7 +136,7 @@ const table = useVueTable({
             <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
               <EditOrDeleteModalTwo
                 :teams="table.getSelectedRowModel().flatRows"
-                :fetch-teams="fetchTeams"
+                :fetch-coupons="fetchCoupon"
               />
             </div>
           </div>
