@@ -3,6 +3,7 @@ import UserView from "@/views/UsersView.vue";
 import TeamsView from "@/views/TeamsView.vue";
 import CouponsView from "@/views/CouponsView.vue";
 import ReviewsView from "@/views/ReviewsView.vue";
+import ScriptsView from "@/views/ScriptsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: "/reviews",
       name: "reviews",
       component: ReviewsView,
+    },
+    {
+      path: "/scripts",
+      name: "scripts",
+      component: ScriptsView,
     },
   ],
 });
