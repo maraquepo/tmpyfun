@@ -1,7 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import CouponsTable from "../components/CouponsTable.vue";
+</script>
 
 <template>
   <main>
-    <h1>Hello Brother</h1>
+    <div class="min-h-screen w-full">
+      <CouponsTable />
+    </div>
   </main>
 </template>

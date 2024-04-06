@@ -17,18 +17,23 @@ import EditOrDeleteModal from "./EditOrDeleteModal.vue";
 import { getUsers } from "../../services/apiClient.ts";
 
 const queryData = ref([]);
+const dataFetched = ref(false);
 
 const fetchPeople = async () => {
   try {
     const response = await getUsers();
-
     queryData.value = response.data;
+    dataFetched.value = true;
   } catch (error) {
     console.error("Error fetching people data:", error);
   }
 };
 
-onMounted(fetchPeople);
+onMounted(() => {
+  if (!dataFetched.value) {
+    fetchPeople();
+  }
+});
 
 const columnsPeople = [
   {

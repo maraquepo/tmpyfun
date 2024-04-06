@@ -54,7 +54,7 @@ watchEffect(() => {
       @click="handleClick"
       class="px-4 py-2 border-green-400 border text-green-400 rounded-md"
     >
-      Edit Team
+      Edit {{ selectedRows.length }} Team
     </button>
     <div
       v-if="isModalOpen"

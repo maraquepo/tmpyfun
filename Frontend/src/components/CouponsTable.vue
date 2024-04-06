@@ -146,12 +146,6 @@ const table = useVueTable({
 });
 </script>
 
-<script lang="ts">
-export default {
-  name: "TeamsTable",
-};
-</script>
-
 <template>
   <div class="px-4 sm:px-6">
     <div class="block">

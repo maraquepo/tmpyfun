@@ -4,7 +4,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
-from cachetools import TTLCache
 
 load_dotenv()
 
@@ -15,10 +14,6 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
-# TTL Cache configuration
-user_cache = TTLCache(maxsize=1000, ttl=1)
-team_cache = TTLCache(maxsize=1000, ttl=300)
 
 class User(db.Model):
     __tablename__ = 'Users'
@@ -57,55 +52,27 @@ class Team(db.Model):
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+# Caching mechanism
+user_cache = {}
+team_cache = {}
+
 def fetch_users():
-    cached_users = user_cache.get("all_users")
-    if cached_users:
-        return cached_users
+    if not user_cache:
+        users = User.query.order_by(desc(User.createdAt)).all()
+        user_cache['all'] = [user.as_dict() for user in users]
+    return user_cache['all']
 
-    users = User.query.order_by(desc(User.createdAt)).all()
-    serialized_users = [user.as_dict() for user in users]
-    user_cache["all_users"] = serialized_users
-    return serialized_users
-
-def fetch_teams():
-    cached_teams = team_cache.get("all_teams")
-    if cached_teams:
-        return cached_teams
-
-    teams = db.session.query(
-        Team.id,
-        Team.title,
-        Team.type,
-        Team.picture,
-        Team.createdAt,
-        Team.updatedAt,
-        Team.creatorId,
-        Team.public_team_id,
-        User.fullname
-    ).join(User).filter(
-        Team.creatorId.isnot(None)
-    ).order_by(Team.createdAt).all()
-
-    serialized_teams = [dict(zip(['id','title', 'type', 'picture', 'createdAt', 'updatedAt', 'creatorId', 'public_team_id','creator_fullname'], team)) for team in teams]
-    team_cache["all_teams"] = serialized_teams
-    return serialized_teams
 
 # Routes
-
 @app.route("/api/users")
 def get_all_users():
-    users = fetch_users()
-    return jsonify(users)
-
-@app.route("/api/teams")
-def get_all_teams():
-    teams = fetch_teams()
-    return jsonify(teams)
+    users = User.query.order_by(desc(User.createdAt)).all()
+    return jsonify([user.as_dict() for user in users])
 
 @app.route("/api/oldusers")
 def get_old_users():
-    users = fetch_users()[:5]  # Get the first 5 users
-    return jsonify(users)
+    users = User.query.order_by(User.createdAt).limit(5).all()
+    return jsonify([user.as_dict() for user in users])
 
 @app.route("/api/user/<string:id>", methods=["PUT"])
 def edit_user(id):
@@ -139,8 +106,6 @@ def edit_team(id):
             setattr(team, key, value)
 
         db.session.commit()
-        # Invalidate team cache
-        team_cache.clear()
         return jsonify({'message': 'Team Updated'})
     else:
         return jsonify({'error': 'Team not found'}), 404
@@ -203,6 +168,24 @@ def update_multiple_teams_picture_url():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@app.route("/api/teams")
+def get_all_teams():
+    teams = db.session.query(
+        Team.id,
+        Team.title,
+        Team.type,
+        Team.picture,
+        Team.createdAt,
+        Team.updatedAt,
+        Team.creatorId,
+        Team.public_team_id,
+        User.fullname
+    ).join(User).filter(
+        Team.creatorId.isnot(None)
+    ).order_by(Team.createdAt).all()
+
+    return jsonify([dict(zip(['id','title', 'type', 'picture', 'createdAt', 'updatedAt', 'creatorId', 'public_team_id','creator_fullname'], team)) for team in teams])
 
 if __name__ == "__main__":
     app.run(debug=False)
