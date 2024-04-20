@@ -17,22 +17,27 @@ import EditOrDeleteModal from "./EditOrDeleteModal.vue";
 import { getUsers } from "../../services/apiClient.ts";
 
 const queryData = ref([]);
-const dataFetched = ref(false);
+const verifiedCount = ref(0);
+const unverifiedCount = ref(0);
 
 const fetchPeople = async () => {
   try {
     const response = await getUsers();
     queryData.value = response.data;
-    dataFetched.value = true;
   } catch (error) {
     console.error("Error fetching people data:", error);
   }
 };
 
+watch(queryData, (newValue) => {
+  verifiedCount.value = newValue.filter((person) => person.verifiedDT).length;
+  unverifiedCount.value = newValue.filter(
+    (person) => !person.verifiedDT
+  ).length;
+});
+
 onMounted(() => {
-  if (!dataFetched.value) {
-    fetchPeople();
-  }
+  fetchPeople();
 });
 
 const columnsPeople = [
@@ -169,6 +174,7 @@ export default {
               placeholder="Search"
               v-model="filter"
             />
+
             <div v-if="Object.keys(rowSelection).length !== 0" class="px-2">
               <EditOrDeleteModal
                 :user="table.getSelectedRowModel().flatRows"
@@ -216,6 +222,9 @@ export default {
         </div>
       </div>
       <div class="mt-8 text-green-400">
+        <div class="mt-8 text-green-400">
+          Verified: {{ verifiedCount }} | Unverified: {{ unverifiedCount }}
+        </div>
         Page {{ table.getState().pagination.pageIndex + 1 }} of
         {{ table.getPageCount() }} -
         {{ table.getFilteredRowModel().rows.length }} results

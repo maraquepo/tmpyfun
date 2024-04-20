@@ -12,6 +12,10 @@ export const getCoupons = () => {
   return useAxios.get("/coupons");
 };
 
+export const getUserStats = () => {
+  return useAxios.get("/accounts/creation-stats");
+};
+
 export const editUser = (id, data) => {
   console.log("Editing user with ID:", id);
   console.log("Data:", data);

@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from cachetools import TTLCache
+from sqlalchemy.sql import extract
 
 load_dotenv()
 
@@ -234,6 +235,19 @@ def update_multiple_teams_picture_url():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@app.route("/api/accounts/creation-stats")
+def get_account_creation_stats():
+    # Query to fetch the month and year an account was created along with the count of created accounts
+    creation_stats = db.session.query(
+        func.date_trunc('month', User.createdAt).label('month_year'),
+        func.count().label('total_accounts_created')
+    ).group_by('month_year').order_by('month_year').all()
+
+    # Serialize the results
+    serialized_stats = [{'month_year': stat[0], 'total_accounts_created': stat[1]} for stat in creation_stats]
+
+    return jsonify(serialized_stats)
 
 if __name__ == "__main__":
     app.run(debug=False)

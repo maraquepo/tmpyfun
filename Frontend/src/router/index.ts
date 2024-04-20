@@ -4,6 +4,7 @@ import TeamsView from "@/views/TeamsView.vue";
 import CouponsView from "@/views/CouponsView.vue";
 import ReviewsView from "@/views/ReviewsView.vue";
 import ScriptsView from "@/views/ScriptsView.vue";
+import StatsView from "@/views/StatsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,10 +24,15 @@ const router = createRouter({
       name: "coupons",
       component: CouponsView,
     },
+    // {
+    //   path: "/reviews",
+    //   name: "reviews",
+    //   component: ReviewsView,
+    // },
     {
-      path: "/reviews",
-      name: "reviews",
-      component: ReviewsView,
+      path: "/stats",
+      name: "stats",
+      component: StatsView,
     },
     {
       path: "/scripts",
