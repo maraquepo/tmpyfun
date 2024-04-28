@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import desc, func
 from cachetools import TTLCache
 from sqlalchemy.sql import extract
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -211,6 +212,31 @@ def update_multiple_users_picture_url():
         db.session.commit()
 
         return jsonify({'message': f'Updated {updated_count} user picture URLs'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route("/api/users/update-created-at", methods=["PUT"])
+def update_multiple_users_created_at():
+    data = request.json
+    user_ids = data.get("userIDs", [])
+
+    if not user_ids:
+        return jsonify({'error': 'No user IDs provided'}), 400
+
+    try:
+        # Fetch users by IDs
+        users = User.query.filter(User.id.in_(user_ids)).all()
+
+        # Update the createdAt attribute of each user
+        for user in users:
+            # Subtract one year from the current createdAt value
+            new_created_at = user.createdAt - timedelta(days=365)
+            user.createdAt = new_created_at
+
+        db.session.commit()
+
+        return jsonify({'message': f'Updated createdAt attribute for {len(users)} users'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500

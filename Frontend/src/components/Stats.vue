@@ -48,11 +48,17 @@ const splitData = (data) => {
   const monthYearArray: string[] = [];
   const totalArray: number[] = [];
   data.forEach((item) => {
-    const monthYear = new Date(item.month_year).toLocaleString("en-us", {
+    const currentMonthYear = new Date(item.month_year);
+    const nextMonthYear = new Date(
+      currentMonthYear.getFullYear(),
+      currentMonthYear.getMonth() + 1
+    );
+    const monthYear = nextMonthYear.toLocaleString("en-us", {
       month: "short",
       year: "numeric",
     });
     monthYearArray.push(monthYear);
+    console.log(monthYearArray);
     totalArray.push(item.total_accounts_created);
   });
 

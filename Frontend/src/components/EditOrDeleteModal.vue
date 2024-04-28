@@ -1,7 +1,11 @@
 import { defineProps } from 'vue';
 <script setup lang="ts">
 import { ref, defineProps, watchEffect } from "vue";
-import { deleteUsers, updateUsersPictureURL } from "../../services/apiClient";
+import {
+  deleteUsers,
+  updateUsersPictureURL,
+  updateUsersCreatedAt,
+} from "../../services/apiClient";
 
 const isModalOpen = ref(false);
 const selectedRows = ref([]);
@@ -38,6 +42,17 @@ const updatePictureURLsOfSelectedUsers = async () => {
     await props.fetchPeople();
   } catch (error) {
     console.error("Error updating picture URLs:", error);
+  }
+};
+
+const updateCreatedAtOfSelectedUsers = async () => {
+  const userIDs = selectedRows.value.map((user) => user.original.id);
+  try {
+    await updateUsersCreatedAt(userIDs);
+    closeModal();
+    await props.fetchPeople();
+  } catch (error) {
+    console.error("Error updating created at:", error);
   }
 };
 
@@ -106,6 +121,12 @@ watchEffect(() => {
             @click="updatePictureURLsOfSelectedUsers"
           >
             Change Picture
+          </button>
+          <button
+            class="btn-update px-4 py-2 text-green-400 border border-green-400 rounded-md mr-4"
+            @click="updateCreatedAtOfSelectedUsers"
+          >
+            Change Date
           </button>
           <button
             @click="closeModal"

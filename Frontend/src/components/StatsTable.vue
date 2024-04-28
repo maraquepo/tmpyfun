@@ -1,11 +1,5 @@
-<template>
-  <div class="container">
-    <Bar v-if="loaded" :data="chartData" />
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, defineProps } from "vue";
+import { defineProps, ref, onMounted } from "vue";
 import { Bar } from "vue-chartjs";
 import {
   Chart as ChartJS,
@@ -27,21 +21,28 @@ ChartJS.register(
 );
 
 const props = defineProps({
-  data: { type: Object, required: true },
+  data: { type: Object },
 });
 
-const loaded = ref(false);
 const chartData = ref(null);
 
-const fetchData = async () => {
-  try {
-    console.log(props.data);
-    chartData.value = props.data.userlist;
-    loaded.value = true;
-  } catch (error) {
-    console.error(error);
-  }
-};
+onMounted(() => {
+  const labels = props.data?.month_year || [];
+  const data = props.data?.total || [];
 
-fetchData();
+  chartData.value = {
+    labels: labels,
+    datasets: [
+      { data: data, backgroundColor: "rgb(52 211 153)", label: "Sign ups" },
+    ],
+  };
+});
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: true,
+};
 </script>
+<template>
+  <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
+</template>

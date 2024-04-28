@@ -42,6 +42,14 @@ export const updateUsersPictureURL = async (userIDs, newPictureURL) => {
   }
 };
 
+export const updateUsersCreatedAt = async (userIDs) => {
+  try {
+    await useAxios.put("/users/update-created-at", { userIDs });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const updateTeamsPictureURL = async (teamIDs, newPictureURL) => {
   try {
     await useAxios.put("/teams/update-picture-url", { teamIDs, newPictureURL });
