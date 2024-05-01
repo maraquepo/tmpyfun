@@ -7,6 +7,7 @@ from sqlalchemy import desc, func
 from cachetools import TTLCache
 from sqlalchemy.sql import extract
 from datetime import datetime, timedelta
+from sqlalchemy import case
 
 load_dotenv()
 
@@ -231,8 +232,11 @@ def update_multiple_users_created_at():
         # Update the createdAt attribute of each user
         for user in users:
             # Subtract one year from the current createdAt value
-            new_created_at = user.createdAt - timedelta(days=365)
+            new_created_at = user.createdAt - timedelta(days=492)
+            new_updated_at = user.updatedAt - timedelta(days=492)
+
             user.createdAt = new_created_at
+            user.updatedAt = new_updated_at
 
         db.session.commit()
 
@@ -264,16 +268,40 @@ def update_multiple_teams_picture_url():
 
 @app.route("/api/accounts/creation-stats")
 def get_account_creation_stats():
-    # Query to fetch the month and year an account was created along with the count of created accounts
+    # Query to fetch the month_year, count of created accounts,
+    # count of verified accounts, and count of unverified accounts
     creation_stats = db.session.query(
         func.date_trunc('month', User.createdAt).label('month_year'),
-        func.count().label('total_accounts_created')
+        func.count().label('total_accounts_created'),
+        func.sum(case((User.verifiedDT != None, 1), else_=0)).label('verified_accounts'),
+        func.sum(case((User.verifiedDT == None, 1), else_=0)).label('unverified_accounts')
     ).group_by('month_year').order_by('month_year').all()
 
     # Serialize the results
-    serialized_stats = [{'month_year': stat[0], 'total_accounts_created': stat[1]} for stat in creation_stats]
+    serialized_stats = [
+        {
+            'month_year': stat[0],
+            'total_accounts_created': stat[1],
+            'verified_accounts': stat[2],
+            'unverified_accounts': stat[3]
+        }
+        for stat in creation_stats
+    ]
 
     return jsonify(serialized_stats)
+
+# @app.route("/api/accounts/creation-stats")
+# def get_account_creation_stats():
+#     # Query to fetch the month and year an account was created along with the count of created accounts
+#     creation_stats = db.session.query(
+#         func.date_trunc('month', User.createdAt).label('month_year'),
+#         func.count().label('total_accounts_created')
+#     ).group_by('month_year').order_by('month_year').all()
+
+#     # Serialize the results
+#     serialized_stats = [{'month_year': stat[0], 'total_accounts_created': stat[1]} for stat in creation_stats]
+
+#     return jsonify(serialized_stats)
 
 if __name__ == "__main__":
     app.run(debug=False)
